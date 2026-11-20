@@ -3,7 +3,7 @@ import { ArrowUpRight, Heart, Search, SlidersHorizontal } from 'lucide-react';
 import { CATEGORY_LABELS, TOURS } from '../data/tours';
 import { useLang } from '../i18n/lang';
 import type { CategoryFilter, SortOption, Tour, TourCategory } from '../types/travel';
-import { img } from '../utils/travelLogic';
+import { Photo } from './Photo';
 import { Ph } from './Placeholder';
 import { TourCard } from './TourCard';
 
@@ -105,7 +105,7 @@ export function ToursSection(props: {
         </div>
 
         {/* Grid */}
-        <motion.div layout className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <motion.div layout className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
           <AnimatePresence mode="popLayout">
             {gridTours.map((tour, n) => (
               <TourCard
@@ -137,7 +137,7 @@ export function ToursSection(props: {
                 onClick={() => props.onOpen(tour.id)}
                 className="group relative flex min-h-[280px] overflow-hidden rounded-[var(--radius-card)] bg-night text-left text-white shadow-card"
               >
-                <img src={img(tour.images[0])} alt="" loading="lazy" className="absolute inset-0 size-full object-cover opacity-80 transition duration-700 group-hover:scale-105" />
+                <Photo name={tour.images[0]} sizes="(min-width: 768px) 620px, 100vw" className="absolute inset-0 size-full object-cover opacity-80 transition duration-700 group-hover:scale-105" />
                 <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-night via-night/45 to-transparent" />
                 <div className="relative mt-auto w-full p-6">
                   <p className="eyebrow text-blue-300">{pick(CATEGORY_LABELS[tour.category])}</p>

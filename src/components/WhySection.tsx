@@ -1,6 +1,6 @@
 import { Award, Feather, Home, SlidersHorizontal } from 'lucide-react';
 import { useLang } from '../i18n/lang';
-import { img } from '../utils/travelLogic';
+import { Photo } from './Photo';
 import { Reveal } from './Reveal';
 
 const ICONS = [Home, SlidersHorizontal, Feather, Award];
@@ -30,11 +30,12 @@ export function WhySection() {
           </ul>
         </div>
         <Reveal className="relative">
-          <div className="grid grid-cols-5 grid-rows-6 gap-3">
-            <img src={img('ahorse-4')} alt={w.alts[0]} loading="lazy" className="col-span-3 row-span-4 h-full min-h-[260px] w-full rounded-[24px] object-cover" />
-            <img src={img('deluun-2', 's')} alt={w.alts[1]} loading="lazy" className="col-span-2 row-span-3 h-full w-full rounded-[24px] object-cover" />
-            <img src={img('nw-5', 's')} alt={w.alts[2]} loading="lazy" className="col-span-2 row-span-3 h-full w-full rounded-[24px] object-cover" />
-            <img src={img('about-camp', 's')} alt={w.alts[3]} loading="lazy" className="col-span-3 row-span-2 h-full w-full rounded-[24px] object-cover" />
+          {/* Panorama-shaped tiles, so each photo keeps its subject: wide, two squares, wide */}
+          <div className="grid grid-cols-2 gap-3">
+            <Photo name="ahorse-4" alt={w.alts[0]} sizes="(min-width: 1024px) 620px, 100vw" className="col-span-2 aspect-[2.6/1] w-full rounded-[22px] object-cover" />
+            <Photo name="deluun-2" alt={w.alts[1]} sizes="(min-width: 1024px) 310px, 50vw" className="aspect-square w-full rounded-[22px] object-cover" />
+            <Photo name="nw-5" alt={w.alts[2]} sizes="(min-width: 1024px) 310px, 50vw" className="aspect-square w-full rounded-[22px] object-cover" />
+            <Photo name="about-camp" alt={w.alts[3]} sizes="(min-width: 1024px) 620px, 100vw" className="col-span-2 aspect-[2.6/1] w-full rounded-[22px] object-cover" />
           </div>
           <p className="mt-3 text-xs text-white/50">{w.caption}</p>
         </Reveal>

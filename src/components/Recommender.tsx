@@ -4,7 +4,8 @@ import { useMemo, useState } from 'react';
 import { CATEGORY_LABELS } from '../data/tours';
 import { useLang } from '../i18n/lang';
 import type { RecommenderCriteria, Tour, TourCategory } from '../types/travel';
-import { daysLabel, img, recommendTours } from '../utils/travelLogic';
+import { daysLabel, recommendTours } from '../utils/travelLogic';
+import { Photo } from './Photo';
 
 function Chips<T extends string>({ name, options, value, onChange }: { name: string; options: { v: T; l: string }[]; value: T; onChange: (v: T) => void }) {
   return (
@@ -54,7 +55,7 @@ export function Recommender({ tours, onOpenTour }: { tours: Tour[]; onOpenTour: 
             <Chips name={f.q2} options={LENGTHS} value={c.length} onChange={(length) => setC({ ...c, length })} />
             <Chips name={f.q3} options={SEASONS} value={c.season} onChange={(season) => setC({ ...c, season })} />
           </div>
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5">
             <AnimatePresence mode="popLayout">
               {picks.map((tour, n) => (
                 <motion.button
@@ -69,16 +70,16 @@ export function Recommender({ tours, onOpenTour }: { tours: Tour[]; onOpenTour: 
                   className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-card text-left shadow-card transition hover:shadow-lift"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden">
-                    <img src={img(tour.images[0], 's')} alt="" className="size-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" />
-                    <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-bold">
-                      <Sparkles className="size-3.5 text-sun" /> {n === 0 ? f.best : f.also}
+                    <Photo name={tour.images[0]} sizes="(min-width: 1024px) 360px, 50vw" className="size-full object-cover transition duration-700 group-hover:scale-105" />
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[0.65rem] font-bold sm:left-3 sm:top-3 sm:px-3 sm:py-1 sm:text-xs">
+                      <Sparkles className="size-3 text-sun sm:size-3.5" /> {n === 0 ? f.best : f.also}
                     </span>
                   </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    <p className="text-xs font-semibold text-muted">{pick(CATEGORY_LABELS[tour.category])}{daysLabel(tour, lang) ? ` · ${daysLabel(tour, lang)}` : ''}</p>
-                    <p className="font-display mt-1 text-xl font-semibold leading-snug">{tour.title}</p>
-                    <p className="mt-2 line-clamp-3 text-sm text-ink/70">{tour.summary}</p>
-                    <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-bold text-accent">
+                  <div className="flex flex-1 flex-col p-3 sm:p-5">
+                    <p className="text-[0.7rem] font-semibold text-muted sm:text-xs">{pick(CATEGORY_LABELS[tour.category])}{daysLabel(tour, lang) ? ` · ${daysLabel(tour, lang)}` : ''}</p>
+                    <p className="font-display mt-1 text-[0.98rem] font-semibold leading-snug sm:text-xl">{tour.title}</p>
+                    <p className="mt-2 hidden line-clamp-3 text-sm text-ink/70 sm:block">{tour.summary}</p>
+                    <span className="mt-auto inline-flex items-center gap-1 pt-3 text-[0.8rem] font-bold text-accent sm:pt-4 sm:text-sm">
                       {f.view} <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
                     </span>
                   </div>

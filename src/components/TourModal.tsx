@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { CATEGORY_LABELS } from '../data/tours';
 import { useLang } from '../i18n/lang';
 import type { Tour } from '../types/travel';
-import { daysLabel, estimateTrip, formatUsd, img } from '../utils/travelLogic';
+import { daysLabel, estimateTrip, formatUsd } from '../utils/travelLogic';
+import { Photo } from './Photo';
 import { Ph, PhBlock } from './Placeholder';
 
 export function TourModal({ tour, onClose, onBook }: { tour: Tour; onClose: () => void; onBook: (tourId: string, travelers: number) => void }) {
@@ -67,14 +68,15 @@ export function TourModal({ tour, onClose, onBook }: { tour: Tour; onClose: () =
         <div className="overflow-y-auto overscroll-contain">
           {/* Gallery */}
           <div className="relative bg-night">
-            <motion.img
-              key={tour.images[shot]}
-              src={img(tour.images[shot], shot === 0 ? 'l' : '')}
-              alt={tour.title}
-              initial={{ opacity: 0.4 }}
-              animate={{ opacity: 1 }}
-              className="aspect-[16/9] max-h-[52vh] w-full object-cover md:aspect-[21/9]"
-            />
+            <motion.div key={tour.images[shot]} initial={{ opacity: 0.4 }} animate={{ opacity: 1 }}>
+              <Photo
+                name={tour.images[shot]}
+                alt={tour.title}
+                eager
+                sizes="(min-width: 1120px) 1120px, 100vw"
+                className="aspect-[16/9] max-h-[52vh] w-full object-cover md:aspect-[21/9]"
+              />
+            </motion.div>
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-night/85 via-transparent to-transparent" />
             <div className="absolute inset-x-0 bottom-0 flex flex-col gap-4 p-5 text-white md:p-8">
               <div>
@@ -90,7 +92,7 @@ export function TourModal({ tour, onClose, onBook }: { tour: Tour; onClose: () =
                     aria-label={m.photo(n + 1)}
                     className={`h-14 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition ${n === shot ? 'border-white' : 'border-transparent opacity-70 hover:opacity-100'}`}
                   >
-                    <img src={img(name, 's')} alt="" className="size-full object-cover" loading="lazy" />
+                    <Photo name={name} sizes="80px" className="size-full object-cover" />
                   </button>
                 ))}
               </div>

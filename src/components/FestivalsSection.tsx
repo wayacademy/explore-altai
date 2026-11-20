@@ -1,7 +1,7 @@
 import { ArrowUpRight, MapPin } from 'lucide-react';
 import { FESTIVALS } from '../data/site';
 import { useLang } from '../i18n/lang';
-import { img } from '../utils/travelLogic';
+import { Photo } from './Photo';
 import { Ph } from './Placeholder';
 import { Reveal } from './Reveal';
 
@@ -12,7 +12,7 @@ export function FestivalsSection({ onOpenTour }: { onOpenTour: (id: string) => v
     <section id="festivals" className="gutter py-6 md:py-10">
       <div className="mx-auto grid max-w-[1240px] gap-5 lg:grid-cols-[0.9fr_1.1fr]">
         <Reveal className="relative min-h-[360px] overflow-hidden rounded-[var(--radius-card)] bg-night text-white shadow-card">
-          <img src={img('gef-1')} alt={f0.imgAlt} loading="lazy" className="absolute inset-0 size-full object-cover object-[38%_50%]" />
+          <Photo name="gef-1" alt={f0.imgAlt} sizes="(min-width: 1024px) 560px, 100vw" focus="22% 45%" className="absolute inset-0 size-full object-cover" />
           <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
           <div className="relative flex h-full flex-col justify-end p-6 md:p-8">
             <p className="eyebrow text-blue-300">{f0.eyebrow}</p>

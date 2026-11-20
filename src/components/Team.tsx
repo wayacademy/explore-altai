@@ -17,11 +17,11 @@ export function Team() {
           </div>
           <Ph>{t.team.todo}</Ph>
         </div>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <ul className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
           {TEAM.map((m, n) => (
-            <Reveal as="li" key={m.id} delay={n * 0.05} className="flex flex-col rounded-[24px] border border-line bg-card p-5 shadow-card">
+            <Reveal as="li" key={m.id} delay={n * 0.05} className={`flex flex-col rounded-[24px] border border-line bg-card p-4 shadow-card sm:p-5 ${n === 0 ? 'col-span-2 lg:col-span-1' : ''}`}>
               {m.photo ? (
-                <img src={img(m.photo)} alt={pick(m.fullName)} loading="lazy" className="size-24 rounded-[20px] object-cover object-top sm:size-28" />
+                <img src={img(m.photo)} alt={pick(m.fullName)} loading="lazy" className="size-20 rounded-[18px] object-cover object-top sm:size-28 sm:rounded-[20px]" />
               ) : (
                 <div className="grid size-24 place-items-center rounded-[20px] border-2 border-dashed border-ph-line bg-ph-bg/70 text-ph-ink sm:size-28">
                   <span className="flex flex-col items-center gap-1 text-center">
@@ -30,9 +30,9 @@ export function Team() {
                   </span>
                 </div>
               )}
-              <p className="mt-4 text-lg font-bold">{pick(m.name)}</p>
+              <p className="mt-3 text-base font-bold sm:mt-4 sm:text-lg">{pick(m.name)}</p>
               <p className="text-xs text-muted">{pick(m.fullName)} · {pick(m.role)}</p>
-              <p className="mt-2 text-sm leading-relaxed text-ink/75">{pick(m.bio)}</p>
+              <p className="mt-2 text-[0.82rem] leading-relaxed text-ink/75 sm:text-sm">{pick(m.bio)}</p>
             </Reveal>
           ))}
         </ul>
