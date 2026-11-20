@@ -97,19 +97,19 @@ export function BookingSection({ expeditions, prefill }: BookingSectionProps) {
   };
 
   return (
-    <section id="booking" className="py-16 lg:py-20 bg-white">
+    <section id="booking" className="py-16 lg:py-24 bg-zinc-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           {/* Left Office & Trust Info */}
           <div className="lg:col-span-5 space-y-6">
             <div>
-              <p className="text-sm font-medium text-blue-700 mb-2">
+              <p className="text-sm font-semibold text-blue-600 mb-2">
                 Захиалга ба зөвлөгөө
               </p>
-              <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight text-balance mb-4">
+              <h2 className="font-editorial text-3xl sm:text-4xl font-extrabold text-zinc-950 tracking-[-0.025em] text-balance mb-4">
                 2026 оны аяллаа одооноос төлөвлөөрэй
               </h2>
-              <p className="text-base text-slate-600 leading-relaxed">
+              <p className="text-base text-zinc-600 leading-relaxed">
                 Доорх хүсэлтийг илгээснээс хойш ажлын 4 цагийн дотор манай ахлах
                 аяллын зөвлөх тантай холбогдож нислэг, баазын суудлыг баталгаажуулна.
               </p>
@@ -147,47 +147,47 @@ export function BookingSection({ expeditions, prefill }: BookingSectionProps) {
             {submittedRef ? (
               <div
                 data-testid="booking-confirmation"
-                className="bg-slate-50 border border-slate-200 rounded-2xl p-8 space-y-6"
+                className="bg-white border border-zinc-200 rounded-2xl p-8 space-y-6"
               >
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-6 h-6 text-blue-700 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-1">
+                    <h3 className="text-xl font-bold text-zinc-950 mb-1">
                       Захиалгын хүсэлт амжилттай бүртгэгдлээ
                     </h3>
-                    <p className="text-sm text-slate-600">
-                      Таны хүсэлтийг <span className="font-semibold text-slate-900">{submittedRef.email}</span> хаяг руу
+                    <p className="text-sm text-zinc-600">
+                      Таны хүсэлтийг <span className="font-semibold text-zinc-950">{submittedRef.email}</span> хаяг руу
                       урьдчилсан баталгаажуулалтын хамт илгээлээ.
                     </p>
                   </div>
                 </div>
 
-                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-5 border-t border-b border-slate-200 text-sm">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-5 border-t border-b border-zinc-200 text-sm">
                   <div>
-                    <dt className="text-xs text-slate-500">Захиалгын код</dt>
-                    <dd className="font-mono font-semibold text-slate-900">
+                    <dt className="text-xs text-zinc-500">Захиалгын код</dt>
+                    <dd className="font-mono font-semibold text-zinc-950">
                       {submittedRef.reference}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">Захиалагч</dt>
-                    <dd className="font-semibold text-slate-900">{submittedRef.fullName}</dd>
+                    <dt className="text-xs text-zinc-500">Захиалагч</dt>
+                    <dd className="font-semibold text-zinc-950">{submittedRef.fullName}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">Сонгосон маршрут</dt>
-                    <dd className="font-semibold text-slate-900">
+                    <dt className="text-xs text-zinc-500">Сонгосон маршрут</dt>
+                    <dd className="font-semibold text-zinc-950">
                       {submittedRef.expeditionTitle}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">Хугацаа ба хүний тоо</dt>
-                    <dd className="font-semibold text-slate-900 tabular-nums">
+                    <dt className="text-xs text-zinc-500">Хугацаа ба хүний тоо</dt>
+                    <dd className="font-semibold text-zinc-950 tabular-nums">
                       {submittedRef.departureDate} · {submittedRef.travelers} хүн
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">Урьдчилсан нийт төсөв</dt>
-                    <dd className="font-bold text-blue-700 tabular-nums">
+                    <dt className="text-xs text-zinc-500">Урьдчилсан нийт төсөв</dt>
+                    <dd className="font-bold text-blue-600 tabular-nums">
                       {formatMnt(submittedRef.totalMnt)}
                     </dd>
                   </div>
@@ -196,7 +196,7 @@ export function BookingSection({ expeditions, prefill }: BookingSectionProps) {
                 <button
                   type="button"
                   onClick={() => setSubmittedRef(null)}
-                  className="px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg transition-colors min-h-[44px]"
+                  className="px-5 py-2.5 text-sm font-semibold text-zinc-700 bg-zinc-50 border border-zinc-300 hover:bg-zinc-100 rounded-lg transition-colors min-h-[44px]"
                 >
                   Өөр аяллын хүсэлт илгээх
                 </button>
@@ -205,7 +205,7 @@ export function BookingSection({ expeditions, prefill }: BookingSectionProps) {
               <form
                 onSubmit={handleSubmit}
                 noValidate
-                className="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-5"
+                className="bg-white border border-zinc-200 rounded-2xl p-6 sm:p-8 space-y-5"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>

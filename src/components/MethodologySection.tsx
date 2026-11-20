@@ -6,7 +6,7 @@ export function MethodologySection() {
   return (
     <section
       id="methodology"
-      className="py-16 lg:py-24 bg-slate-950 text-slate-100 border-b border-slate-800"
+      className="py-16 lg:py-24 bg-zinc-950 text-zinc-100 border-b border-zinc-800"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-stretch">
@@ -16,10 +16,10 @@ export function MethodologySection() {
               <p className="text-sm font-medium text-blue-400 tracking-wide mb-2">
                 Бид хэрхэн ажилладаг вэ
               </p>
-              <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-white tracking-tight text-balance mb-4">
+              <h2 className="font-editorial text-3xl sm:text-4xl font-extrabold text-white tracking-[-0.025em] text-balance mb-4">
                 Саадгүй аяллын ард буй дөрвөн зарчим
               </h2>
-              <p className="text-base text-slate-300 leading-relaxed mb-8">
+              <p className="text-base text-zinc-300 leading-relaxed mb-8">
                 Хээрийн нөхцөлд гэнэтийн эрсдэлгүй, тав тухтай аялахын тулд бид маршрут
                 боловсруулалтаас эхлээд бааз сонголт хүртэлх бүх шатыг өөрсдөө шалгаж
                 баталгаажуулдаг.

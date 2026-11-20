@@ -27,7 +27,7 @@ export function TripRecommenderAndProof({
   );
 
   return (
-    <section id="recommender" className="py-16 lg:py-20 bg-slate-50 border-b border-slate-200">
+    <section id="recommender" className="py-16 lg:py-24 bg-white border-b border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Interactive Expedition Recommender */}
         <div>
@@ -38,13 +38,13 @@ export function TripRecommenderAndProof({
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-2xl mb-8"
           >
-            <p className="text-sm font-medium text-blue-700 mb-2">
+            <p className="text-sm font-semibold text-blue-600 mb-2">
               Аяллын тохируулагч
             </p>
-            <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight text-balance mb-3">
+            <h2 className="font-editorial text-3xl sm:text-4xl font-extrabold text-zinc-950 tracking-[-0.025em] text-balance mb-3">
               Өөрт тохирох чиглэлээ 10 секундэд олоорой
             </h2>
-            <p className="text-base text-slate-600">
+            <p className="text-base text-zinc-600">
               Сонирхож буй байгалийн тогтоц, аяллын хоног болон хэмнэлээ сонгомогц танд
               хамгийн их нийцэх хоёр маршрутыг шууд санал болгоно.
             </p>
@@ -52,9 +52,9 @@ export function TripRecommenderAndProof({
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Controls */}
-            <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
+            <div className="lg:col-span-5 bg-zinc-50 border border-zinc-200 rounded-2xl p-6 space-y-6">
               <div>
-                <span className="block text-sm font-semibold text-slate-900 mb-2.5">
+                <span className="block text-sm font-semibold text-zinc-900 mb-2.5">
                   1. Байгалийн төрөл
                 </span>
                 <div className="grid grid-cols-2 gap-2">
@@ -77,10 +77,10 @@ export function TripRecommenderAndProof({
                             interest: item.id as RecommenderCriteria['interest'],
                           }))
                         }
-                        className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg border text-left transition-colors min-h-[40px] ${
+                        className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-xl border text-left transition-colors min-h-[40px] ${
                           active
-                            ? 'bg-blue-700 text-white border-blue-700'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            ? 'bg-zinc-950 text-white border-zinc-950'
+                            : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100'
                         }`}
                       >
                         {item.label}
@@ -91,7 +91,7 @@ export function TripRecommenderAndProof({
               </div>
 
               <div>
-                <span className="block text-sm font-semibold text-slate-900 mb-2.5">
+                <span className="block text-sm font-semibold text-zinc-900 mb-2.5">
                   2. Хугацааны сонголт
                 </span>
                 <div className="grid grid-cols-3 gap-2">
@@ -112,10 +112,10 @@ export function TripRecommenderAndProof({
                             durationBucket: item.id as RecommenderCriteria['durationBucket'],
                           }))
                         }
-                        className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg border text-center transition-colors min-h-[40px] tabular-nums ${
+                        className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-xl border text-center transition-colors min-h-[40px] tabular-nums ${
                           active
-                            ? 'bg-blue-700 text-white border-blue-700'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            ? 'bg-zinc-950 text-white border-zinc-950'
+                            : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100'
                         }`}
                       >
                         {item.label}
@@ -126,7 +126,7 @@ export function TripRecommenderAndProof({
               </div>
 
               <div>
-                <span className="block text-sm font-semibold text-slate-900 mb-2.5">
+                <span className="block text-sm font-semibold text-zinc-900 mb-2.5">
                   3. Аяллын хэмнэл
                 </span>
                 <div className="grid grid-cols-3 gap-2">
@@ -147,10 +147,10 @@ export function TripRecommenderAndProof({
                             pace: item.id as RecommenderCriteria['pace'],
                           }))
                         }
-                        className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg border text-center transition-colors min-h-[40px] ${
+                        className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-xl border text-center transition-colors min-h-[40px] ${
                           active
-                            ? 'bg-blue-700 text-white border-blue-700'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            ? 'bg-zinc-950 text-white border-zinc-950'
+                            : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100'
                         }`}
                       >
                         {item.label}
@@ -217,13 +217,13 @@ export function TripRecommenderAndProof({
         </div>
 
         {/* Claim-to-Proof Adjacent Testimonials */}
-        <div className="pt-12 border-t border-slate-200">
+        <div className="pt-12 border-t border-zinc-200">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div>
-              <p className="text-sm font-medium text-blue-700 mb-2">
+              <p className="text-sm font-semibold text-blue-600 mb-2">
                 Аялагчдын бодит түүх
               </p>
-              <h2 className="font-editorial text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+              <h2 className="font-editorial text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-[-0.025em]">
                 Бидэнтэй аялсан багуудын сэтгэгдэл
               </h2>
             </div>
@@ -241,7 +241,7 @@ export function TripRecommenderAndProof({
                   delay: idx * 0.06,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col justify-between"
+                className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 flex flex-col justify-between"
               >
                 <div>
                   <p className="text-xs font-medium text-slate-500 mb-3">

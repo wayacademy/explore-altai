@@ -91,7 +91,7 @@ export function ExpeditionModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-zinc-950/65 backdrop-blur-xs overflow-y-auto"
       role="presentation"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
@@ -107,17 +107,17 @@ export function ExpeditionModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-expedition-title"
-        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-slate-200 shadow-2xl"
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-zinc-200 shadow-2xl"
       >
         {/* Top Modal Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-6 py-4 bg-white/95 backdrop-blur-sm border-b border-slate-200">
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-6 py-4 bg-white/95 backdrop-blur-sm border-b border-zinc-200">
           <div className="min-w-0">
-            <p className="text-xs text-slate-500 truncate">
+            <p className="text-xs text-zinc-500 truncate">
               {expedition.categoryLabel} · {expedition.region} · {expedition.coordinates}
             </p>
             <h2
               id="modal-expedition-title"
-              className="font-editorial text-xl sm:text-2xl font-bold text-slate-900 truncate"
+              className="font-editorial text-xl sm:text-2xl font-bold text-zinc-950 tracking-[-0.02em] truncate"
             >
               {expedition.title}
             </h2>
@@ -126,7 +126,7 @@ export function ExpeditionModal({
             type="button"
             onClick={onClose}
             aria-label="Аяллын цонх хаах"
-            className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            className="w-10 h-10 rounded-xl border border-zinc-200 flex items-center justify-center text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
           >
             <X className="w-5 h-5" />
           </button>
@@ -135,7 +135,7 @@ export function ExpeditionModal({
         <div className="p-6 space-y-8">
           {/* Hero photo + tabular specs */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            <div className="lg:col-span-7 aspect-[16/10] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+            <div className="lg:col-span-7 aspect-[16/10] rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200">
               <SafeImage
                 src={expedition.imageUrl}
                 alt={expedition.imageAlt}
@@ -144,40 +144,40 @@ export function ExpeditionModal({
               />
             </div>
 
-            <div className="lg:col-span-5 flex flex-col justify-between bg-slate-50 rounded-xl p-5 border border-slate-200">
-              <p className="text-sm text-slate-700 leading-relaxed mb-4">
+            <div className="lg:col-span-5 flex flex-col justify-between bg-zinc-50 rounded-xl p-5 border border-zinc-200">
+              <p className="text-sm text-zinc-700 leading-relaxed mb-4">
                 {expedition.summary}
               </p>
-              <dl className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200 text-sm">
+              <dl className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-200 text-sm">
                 <div>
-                  <dt className="text-xs text-slate-500">Үргэлжлэх хугацаа</dt>
-                  <dd className="font-semibold text-slate-900 tabular-nums">
+                  <dt className="text-xs text-zinc-500">Үргэлжлэх хугацаа</dt>
+                  <dd className="font-semibold text-zinc-950 tabular-nums">
                     {expedition.days} өдөр / {expedition.nights} шөнө
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Дээд өндөрлөг</dt>
-                  <dd className="font-semibold text-slate-900 tabular-nums">
+                  <dt className="text-xs text-zinc-500">Дээд өндөрлөг</dt>
+                  <dd className="font-semibold text-zinc-950 tabular-nums">
                     {expedition.elevationM.toLocaleString('en-US')} м
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Нийт туулах зам</dt>
-                  <dd className="font-semibold text-slate-900 tabular-nums">
+                  <dt className="text-xs text-zinc-500">Нийт туулах зам</dt>
+                  <dd className="font-semibold text-zinc-950 tabular-nums">
                     {expedition.distanceKm.toLocaleString('en-US')} км
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Тохиромжтой улирал</dt>
-                  <dd className="font-semibold text-slate-900">{expedition.bestSeason}</dd>
+                  <dt className="text-xs text-zinc-500">Тохиромжтой улирал</dt>
+                  <dd className="font-semibold text-zinc-950">{expedition.bestSeason}</dd>
                 </div>
               </dl>
             </div>
           </div>
 
           {/* Interactive Day-by-Day Itinerary */}
-          <div className="border-t border-slate-200 pt-6">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">
+          <div className="border-t border-zinc-200 pt-6">
+            <h3 className="font-editorial text-lg font-bold text-zinc-950 mb-4">
               Өдөр бүрийн аяллын хөтөлбөр
             </h3>
             <div className="flex flex-wrap gap-2 mb-4" role="tablist" aria-label="Өдрийн сонголт">
@@ -190,10 +190,10 @@ export function ExpeditionModal({
                     role="tab"
                     aria-selected={active}
                     onClick={() => setActiveDay(item.day)}
-                    className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 tabular-nums ${
+                    className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-xl border transition-colors whitespace-nowrap shrink-0 tabular-nums ${
                       active
-                        ? 'bg-blue-700 text-white border-blue-700'
-                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                        ? 'bg-zinc-950 text-white border-zinc-950'
+                        : 'bg-white text-zinc-700 border-zinc-300 hover:bg-zinc-50'
                     }`}
                   >
                     {item.day}-р өдөр
@@ -210,22 +210,22 @@ export function ExpeditionModal({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -6 }}
                   transition={{ duration: 0.13, ease: [0.16, 1, 0.3, 1] }}
-                  className="bg-slate-50 border border-slate-200 rounded-xl p-5"
+                  className="bg-zinc-50 border border-zinc-200 rounded-xl p-5"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <h4 className="font-bold text-slate-900">
+                    <h4 className="font-bold text-zinc-950">
                       {currentDayPlan.day}-р өдөр: {currentDayPlan.title}
                     </h4>
-                    <span className="text-xs font-mono text-slate-600">
+                    <span className="text-xs font-mono text-zinc-600">
                       {currentDayPlan.route}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-700 leading-relaxed mb-3">
+                  <p className="text-sm text-zinc-700 leading-relaxed mb-3">
                     {currentDayPlan.description}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-zinc-500">
                     Байрлах газар:{' '}
-                    <span className="font-medium text-slate-800">
+                    <span className="font-medium text-zinc-900">
                       {currentDayPlan.accommodation}
                     </span>
                   </p>
@@ -235,15 +235,15 @@ export function ExpeditionModal({
           </div>
 
           {/* Included & Live Price Estimator */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 border-t border-slate-200 pt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 border-t border-zinc-200 pt-6">
             <div className="lg:col-span-5">
-              <h3 className="text-lg font-bold text-slate-900 mb-3">
+              <h3 className="font-editorial text-lg font-bold text-zinc-950 mb-3">
                 Аяллын үнэд багтсан зүйлс
               </h3>
-              <ul className="space-y-2.5 text-sm text-slate-700">
+              <ul className="space-y-2.5 text-sm text-zinc-700">
                 {expedition.included.map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-blue-700 mt-0.5 shrink-0" />
+                    <Check className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -251,13 +251,13 @@ export function ExpeditionModal({
             </div>
 
             {/* Live Pricing Calculator */}
-            <div className="lg:col-span-7 bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-5">
+            <div className="lg:col-span-7 bg-zinc-50 border border-zinc-200 rounded-xl p-5 space-y-5">
               <div className="flex items-center justify-between gap-4">
-                <h3 className="text-lg font-bold text-slate-900">
+                <h3 className="font-editorial text-lg font-bold text-zinc-950">
                   Зардлын тооцоолуур
                 </h3>
                 {estimate.discountRate > 0 && (
-                  <span className="text-xs font-semibold text-blue-700 tabular-nums">
+                  <span className="text-xs font-semibold text-blue-600 tabular-nums">
                     Бүлгийн {Math.round(estimate.discountRate * 100)}% хөнгөлөлт идэвхтэй
                   </span>
                 )}
@@ -265,21 +265,21 @@ export function ExpeditionModal({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <span className="block text-xs font-medium text-slate-600 mb-1.5">
+                  <span className="block text-xs font-medium text-zinc-600 mb-1.5">
                     Аялагчдын тоо (4+ хүн 5%, 8+ хүн 10% хямдралтай)
                   </span>
-                  <div className="inline-flex items-center border border-slate-300 bg-white rounded-lg">
+                  <div className="inline-flex items-center border border-zinc-300 bg-white rounded-xl">
                     <button
                       type="button"
                       onClick={() => setTravelers((n) => Math.max(1, n - 1))}
                       aria-label="Аялагчийн тоог хасах"
-                      className="w-10 h-10 flex items-center justify-center text-slate-700 hover:bg-slate-100 rounded-l-lg"
+                      className="w-10 h-10 flex items-center justify-center text-zinc-700 hover:bg-zinc-100 rounded-l-xl"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
                     <span
                       data-testid="modal-travelers-count"
-                      className="w-12 text-center text-sm font-bold text-slate-900 tabular-nums"
+                      className="w-12 text-center text-sm font-bold text-zinc-950 tabular-nums"
                     >
                       {travelers}
                     </span>
@@ -287,7 +287,7 @@ export function ExpeditionModal({
                       type="button"
                       onClick={() => setTravelers((n) => Math.min(20, n + 1))}
                       aria-label="Аялагчийн тоог нэмэх"
-                      className="w-10 h-10 flex items-center justify-center text-slate-700 hover:bg-slate-100 rounded-r-lg"
+                      className="w-10 h-10 flex items-center justify-center text-zinc-700 hover:bg-zinc-100 rounded-r-xl"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -295,17 +295,17 @@ export function ExpeditionModal({
                 </div>
 
                 <div>
-                  <span className="block text-xs font-medium text-slate-600 mb-1.5">
+                  <span className="block text-xs font-medium text-zinc-600 mb-1.5">
                     Аяллын ангилал (VIP: +35% хувийн хөтөч)
                   </span>
-                  <div className="grid grid-cols-2 gap-1 p-1 bg-slate-200/70 rounded-lg">
+                  <div className="grid grid-cols-2 gap-1 p-1 bg-zinc-200/70 rounded-xl">
                     <button
                       type="button"
                       onClick={() => setTier('standard')}
-                      className={`py-2 px-3 text-xs font-semibold rounded-md transition-colors whitespace-nowrap ${
+                      className={`py-2 px-3 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
                         tier === 'standard'
-                          ? 'bg-white text-slate-900 shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900'
+                          ? 'bg-white text-zinc-950 shadow-sm'
+                          : 'text-zinc-600 hover:text-zinc-950'
                       }`}
                     >
                       Стандарт
@@ -313,10 +313,10 @@ export function ExpeditionModal({
                     <button
                       type="button"
                       onClick={() => setTier('vip')}
-                      className={`py-2 px-3 text-xs font-semibold rounded-md transition-colors whitespace-nowrap ${
+                      className={`py-2 px-3 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
                         tier === 'vip'
-                          ? 'bg-white text-slate-900 shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900'
+                          ? 'bg-white text-zinc-950 shadow-sm'
+                          : 'text-zinc-600 hover:text-zinc-950'
                       }`}
                     >
                       Хувийн VIP
@@ -327,7 +327,7 @@ export function ExpeditionModal({
 
               {/* Addons */}
               <div>
-                <span className="block text-xs font-medium text-slate-600 mb-2">
+                <span className="block text-xs font-medium text-zinc-600 mb-2">
                   Нэмэлт сонголтууд (1 хүнд ногдох)
                 </span>
                 <div className="space-y-2">
@@ -336,23 +336,23 @@ export function ExpeditionModal({
                     return (
                       <label
                         key={addon.id}
-                        className="flex items-center justify-between gap-3 p-2.5 bg-white border border-slate-200 rounded-lg cursor-pointer hover:border-slate-300"
+                        className="flex items-center justify-between gap-3 p-2.5 bg-white border border-zinc-200 rounded-xl cursor-pointer hover:border-zinc-300"
                       >
                         <div className="flex items-center gap-2.5">
                           <input
                             type="checkbox"
                             checked={checked}
                             onChange={() => toggleAddon(addon.id)}
-                            className="w-4 h-4 rounded border-slate-300 text-blue-700 focus:ring-blue-700"
+                            className="w-4 h-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-600"
                           />
                           <div>
-                            <div className="text-sm font-medium text-slate-900">
+                            <div className="text-sm font-medium text-zinc-950">
                               {addon.label}
                             </div>
-                            <div className="text-xs text-slate-500">{addon.description}</div>
+                            <div className="text-xs text-zinc-500">{addon.description}</div>
                           </div>
                         </div>
-                        <span className="text-xs font-semibold text-slate-700 tabular-nums whitespace-nowrap">
+                        <span className="text-xs font-semibold text-zinc-700 tabular-nums whitespace-nowrap">
                           +{formatMnt(addon.pricePerPersonMnt)}
                         </span>
                       </label>
@@ -362,17 +362,17 @@ export function ExpeditionModal({
               </div>
 
               {/* Final Estimate Row */}
-              <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="pt-4 border-t border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-zinc-500">
                     Нийт урьдчилсан дүн ({travelers} хүн · 1 хүнд{' '}
-                    <span className="tabular-nums font-medium text-slate-700">
+                    <span className="tabular-nums font-medium text-zinc-700">
                       {formatMnt(estimate.perPersonMnt)}
                     </span>
                     )
                   </div>
                   {estimate.discountAmount > 0 && (
-                    <div className="text-xs text-blue-700 font-medium tabular-nums">
+                    <div className="text-xs text-blue-600 font-medium tabular-nums">
                       Бүлгийн хөнгөлөлтөөр {formatMnt(estimate.discountAmount)} хэмнэж байна
                     </div>
                   )}
@@ -382,7 +382,7 @@ export function ExpeditionModal({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.18 }}
                     data-testid="modal-total-estimate"
-                    className="text-2xl font-bold text-slate-900 tabular-nums"
+                    className="text-2xl font-bold text-zinc-950 tabular-nums"
                   >
                     {formatMnt(estimate.totalMnt)}
                   </motion.div>
@@ -392,7 +392,7 @@ export function ExpeditionModal({
                   type="button"
                   whileTap={{ scale: 0.97 }}
                   onClick={handleBookClick}
-                  className="px-6 py-3 text-sm font-semibold text-white bg-blue-700 hover:bg-blue-800 rounded-lg transition-colors whitespace-nowrap shrink-0 min-h-[44px]"
+                  className="px-6 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors whitespace-nowrap shrink-0 min-h-[44px]"
                 >
                   Энэ аяллыг захиалах
                 </motion.button>
