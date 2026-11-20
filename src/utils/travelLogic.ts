@@ -1,277 +1,98 @@
+import { DEPOSIT_USD } from '../data/site';
+import { UI } from '../i18n/ui';
 import type {
-  AddonId,
-  AddonOption,
   BookingFormValues,
   BookingValidationErrors,
-  Expedition,
   FilterState,
-  Language,
+  Lang,
   PriceEstimate,
   RecommenderCriteria,
-  TravelTier,
+  Tour,
 } from '../types/travel';
 
-export const ADDON_OPTIONS: AddonOption[] = [
-  {
-    id: 'horse-guide',
-    label: {
-      mn: 'Нэмэлт морин хөтөч ба ачааны мал',
-      en: 'Dedicated Horse Guide & Extra Pack Animal',
-    },
-    description: {
-      mn: 'Хөтөч, эмээл тоноглол болон ачаа зөөх нэмэлт морь/тэмээ',
-      en: 'Additional wrangler support & luggage horse/camel allocation',
-    },
-    pricePerPersonUsd: 160,
-  },
-  {
-    id: 'photo-gear',
-    label: {
-      mn: 'Гэрэл зургийн хөтөч ба цагийн төлөвлөлт',
-      en: 'Wildlife & Eagle Photography Field Guide',
-    },
-    description: {
-      mn: 'Нар мандах/жаргах цаг болон ан амьтны ажиглалтын цэгүүд',
-      en: 'Golden-hour positioning for landscapes, eagles & wildlife',
-    },
-    pricePerPersonUsd: 210,
-  },
-  {
-    id: 'drone-film',
-    label: {
-      mn: 'Аяллын 4K баримтат бичлэг ба зураг',
-      en: 'Expedition 4K Drone & Documentary Edit',
-    },
-    description: {
-      mn: 'Багийн аяллын дурсамжийн эвлүүлсэн богино кино',
-      en: 'Edited aerial and ground highlight film of your expedition',
-    },
-    pricePerPersonUsd: 290,
-  },
-];
-
-export function formatUsd(amount: number): string {
-  const rounded = Math.round(amount);
-  return `$${rounded.toLocaleString('en-US')}`;
+/** public/img доторх зургийн зам. size: 's' жижиг (720px), 'l' том (1800px), '' дунд (1200px). */
+export function img(name: string, size: '' | 's' | 'l' = ''): string {
+  return `./img/${name}${size ? `-${size}` : ''}.webp`;
 }
 
-export function filterAndSortTrips(
-  trips: Expedition[],
-  state: FilterState,
-): Expedition[] {
-  const normalizedQuery = state.query.trim().toLowerCase();
+export function formatUsd(amount: number): string {
+  return `$${Math.round(amount).toLocaleString('en-US')}`;
+}
 
-  const filtered = trips.filter((trip) => {
-    if (state.savedOnly && !state.savedIds.includes(trip.id)) {
-      return false;
-    }
-    if (state.category !== 'all' && trip.category !== state.category) {
-      return false;
-    }
-    if (normalizedQuery.length > 0) {
-      const searchable = [
-        String(trip.number),
-        trip.title.mn,
-        trip.title.en,
-        trip.subtitle.mn,
-        trip.subtitle.en,
-        trip.region.mn,
-        trip.region.en,
-        trip.categoryLabel.mn,
-        trip.categoryLabel.en,
-        trip.summary.mn,
-        trip.summary.en,
-        ...trip.highlights.mn,
-        ...trip.highlights.en,
-        ...trip.overview.mn,
-        ...trip.overview.en,
-      ]
-        .join(' ')
-        .toLowerCase();
-      if (!searchable.includes(normalizedQuery)) {
-        return false;
-      }
+export function daysLabel(tour: Tour, lang: Lang = 'mn'): string | null {
+  if (tour.days) return UI[lang].days(tour.days);
+  return tour.daysNote ?? null;
+}
+
+export function filterAndSortTours(tours: Tour[], state: FilterState): Tour[] {
+  const q = state.query.trim().toLowerCase();
+  const filtered = tours.filter((t) => {
+    if (state.savedOnly && !state.savedIds.includes(t.id)) return false;
+    if (state.category !== 'all' && t.category !== state.category) return false;
+    if (q) {
+      const hay = [t.title, t.titleEn, t.region, t.summary, ...t.highlights].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
     }
     return true;
   });
-
-  const sorted = [...filtered].sort((a, b) => {
-    if (state.sortBy === 'price-asc') {
-      const aPrice = a.keyFacts.priceUsd ?? Number.MAX_SAFE_INTEGER;
-      const bPrice = b.keyFacts.priceUsd ?? Number.MAX_SAFE_INTEGER;
-      if (aPrice !== bPrice) {
-        return aPrice - bPrice;
-      }
-      return a.number - b.number;
-    }
-    if (state.sortBy === 'duration-asc') {
-      const aDays = a.keyFacts.days ?? Number.MAX_SAFE_INTEGER;
-      const bDays = b.keyFacts.days ?? Number.MAX_SAFE_INTEGER;
-      if (aDays !== bDays) {
-        return aDays - bDays;
-      }
-      return a.number - b.number;
-    }
-    if (state.sortBy === 'duration-desc') {
-      const aDays = a.keyFacts.days ?? -1;
-      const bDays = b.keyFacts.days ?? -1;
-      if (aDays !== bDays) {
-        return bDays - aDays;
-      }
-      return a.number - b.number;
-    }
-    // Featured / default catalog order 1..20
-    return a.number - b.number;
+  // Хугацаа/үнэ мэдэгдэхгүй аяллууд жагсаалтын төгсгөлд үлдэнэ.
+  const big = Number.MAX_SAFE_INTEGER;
+  return [...filtered].sort((a, b) => {
+    if (state.sortBy === 'duration-asc') return (a.days ?? big) - (b.days ?? big);
+    if (state.sortBy === 'duration-desc') return (b.days ?? -1) - (a.days ?? -1);
+    if (state.sortBy === 'price-asc') return (a.priceUsd ?? big) - (b.priceUsd ?? big);
+    const f = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
+    return f !== 0 ? f : tours.indexOf(a) - tours.indexOf(b);
   });
-
-  return sorted;
 }
 
-export function calculateTripEstimate(
-  basePriceUsd: number | null,
-  travelers: number,
-  tier: TravelTier,
-  selectedAddons: AddonId[],
-): PriceEstimate {
-  const safeTravelers = Math.max(1, Math.min(20, Math.floor(travelers)));
-  const isPriceOnRequest = basePriceUsd === null;
-  const effectiveBase = basePriceUsd ?? 0;
-  const tierMultiplier = tier === 'vip' ? 1.35 : 1;
-  const baseSubtotalUsd = Math.round(
-    effectiveBase * safeTravelers * tierMultiplier,
-  );
+const SEASON_MONTHS: Record<Exclude<RecommenderCriteria['season'], 'any'>, number[]> = {
+  summer: [6, 7, 8],
+  autumn: [9, 10],
+  winter: [11, 12, 1, 2, 3],
+};
 
-  const addonsPerPerson = selectedAddons.reduce((sum, id) => {
-    const found = ADDON_OPTIONS.find((item) => item.id === id);
-    return sum + (found ? found.pricePerPersonUsd : 0);
-  }, 0);
-  const addonsTotalUsd = addonsPerPerson * safeTravelers;
-
-  let discountRate = 0;
-  if (safeTravelers >= 8) {
-    discountRate = 0.1;
-  } else if (safeTravelers >= 4) {
-    discountRate = 0.05;
-  }
-
-  const gross = baseSubtotalUsd + addonsTotalUsd;
-  const discountAmountUsd = Math.round(gross * discountRate);
-  const totalUsd = gross - discountAmountUsd;
-  const perPersonUsd = Math.round(totalUsd / safeTravelers);
-
-  return {
-    isPriceOnRequest,
-    basePriceUsd: effectiveBase,
-    baseSubtotalUsd,
-    tierMultiplier,
-    addonsTotalUsd,
-    discountRate,
-    discountAmountUsd,
-    totalUsd,
-    perPersonUsd,
-  };
-}
-
-export function recommendTrips(
-  trips: Expedition[],
-  criteria: RecommenderCriteria,
-): Expedition[] {
-  const scored = trips.map((trip) => {
+export function recommendTours(tours: Tour[], c: RecommenderCriteria): Tour[] {
+  const scored = tours.map((t) => {
     let score = 0;
-
-    if (criteria.interest === 'any' || trip.category === criteria.interest) {
-      score += 5;
+    if (c.interest === 'any' || t.category === c.interest) score += 4;
+    const d = t.days ?? 0;
+    if ((c.length === 'short' && d > 0 && d <= 10) || (c.length === 'medium' && d >= 11 && d <= 14) || (c.length === 'long' && d >= 15)) {
+      score += 3;
     }
-
-    const days = trip.keyFacts.days;
-    if (criteria.durationBucket === 'short') {
-      if ((days !== null && days <= 10) || days === null) {
-        score += days !== null ? 3 : 2;
-      }
-    } else if (criteria.durationBucket === 'medium') {
-      if (days !== null && days >= 11 && days <= 14) {
-        score += 3;
-      }
-    } else if (criteria.durationBucket === 'long') {
-      if (days !== null && days >= 15) {
-        score += 3;
-      }
+    if (c.season !== 'any' && t.months) {
+      if (t.months.some((m) => SEASON_MONTHS[c.season as keyof typeof SEASON_MONTHS].includes(m))) score += 3;
+      else score -= 2;
     }
-
-    if (trip.pace === criteria.pace) {
-      score += 2;
-    }
-
-    if (trip.featured) {
-      score += 0.5;
-    }
-
-    return { trip, score };
+    if (t.featured) score += 0.5;
+    return { t, score };
   });
-
-  scored.sort((a, b) => b.score - a.score || a.trip.number - b.trip.number);
-  return scored.slice(0, 2).map((entry) => entry.trip);
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, 2).map((s) => s.t);
 }
 
-export function validateBookingForm(
-  values: BookingFormValues,
-  lang: Language = 'mn',
-): BookingValidationErrors {
-  const errors: BookingValidationErrors = {};
-
-  if (!values.fullName || values.fullName.trim().length < 2) {
-    errors.fullName =
-      lang === 'en'
-        ? 'Please enter your full name (at least 2 characters).'
-        : 'Овог нэрээ бүтнээр оруулна уу (хамгийн багадаа 2 тэмдэгт).';
-  }
-
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  if (!values.email || !emailPattern.test(values.email.trim())) {
-    errors.email =
-      lang === 'en'
-        ? 'Please enter a valid email address (e.g., name@domain.com).'
-        : 'Зөв имэйл хаяг оруулна уу (жишээ: bat@domain.mn).';
-  }
-
-  const digitsOnly = (values.phone || '').replace(/\D/g, '');
-  if (digitsOnly.length < 8 || digitsOnly.length > 15) {
-    errors.phone =
-      lang === 'en'
-        ? 'Please enter a valid phone number (8–15 digits).'
-        : 'Холбогдох утасны дугаараа зөв оруулна уу (8–15 орон).';
-  }
-
-  if (!values.expeditionId) {
-    errors.expeditionId =
-      lang === 'en'
-        ? 'Please choose a tour route.'
-        : 'Аяллын чиглэлээ сонгоно уу.';
-  }
-
-  if (
-    !Number.isFinite(values.travelers) ||
-    values.travelers < 1 ||
-    values.travelers > 20
-  ) {
-    errors.travelers =
-      lang === 'en'
-        ? 'Travelers must be between 1 and 20.'
-        : 'Аялагчдын тоо 1-ээс 20 хооронд байх ёстой.';
-  }
-
-  if (!values.departureDate) {
-    errors.departureDate =
-      lang === 'en'
-        ? 'Please choose a preferred departure date.'
-        : 'Гарах боломжит огноогоо сонгоно уу.';
-  }
-
-  return errors;
+export function estimateTrip(priceUsd: number | null, travelers: number): PriceEstimate {
+  const n = Math.max(1, Math.min(20, Math.floor(travelers || 1)));
+  const depositUsd = DEPOSIT_USD * n;
+  if (priceUsd == null) return { totalUsd: null, depositUsd, balanceUsd: null };
+  const totalUsd = priceUsd * n;
+  return { totalUsd, depositUsd, balanceUsd: Math.max(0, totalUsd - depositUsd) };
 }
 
-export function generateBookingReference(expeditionSlug: string): string {
-  const code = expeditionSlug.slice(0, 3).toUpperCase();
-  const suffix = Math.floor(1000 + Math.random() * 9000);
-  return `EA-2026-${code}-${suffix}`;
+export function validateBooking(v: BookingFormValues, lang: Lang = 'mn'): BookingValidationErrors {
+  const msg = UI[lang].booking.errors;
+  const e: BookingValidationErrors = {};
+  if (!v.fullName || v.fullName.trim().length < 2) e.fullName = msg.fullName;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((v.email || '').trim())) e.email = msg.email;
+  const digits = (v.phone || '').replace(/\D/g, '');
+  if (digits.length < 8 || digits.length > 15) e.phone = msg.phone;
+  if (!v.tourId) e.tourId = msg.tourId;
+  if (!Number.isFinite(v.travelers) || v.travelers < 1 || v.travelers > 20) e.travelers = msg.travelers;
+  if (!v.month) e.month = msg.month;
+  return e;
+}
+
+export function bookingReference(tourId: string): string {
+  const code = tourId.replace(/[^a-z]/gi, '').slice(0, 3).toUpperCase();
+  return `EA-${new Date().getFullYear()}-${code}-${Math.floor(1000 + Math.random() * 9000)}`;
 }

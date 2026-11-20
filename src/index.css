@@ -1,56 +1,148 @@
 @import "tailwindcss";
 
+/* Layout: full-bleed dark video hero and a full-bleed dark band; between them a
+   centred 1240px column of rounded white cards on zinc-50. */
 @theme {
-  --font-display: "Manrope", system-ui, -apple-system, sans-serif;
-  --font-sans: "Golos Text", "Manrope", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "Manrope", "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Golos Text", "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-paper: #fafafa;      /* zinc-50 page ground (owner's dark-theme push) */
+  --color-card: #ffffff;
+  --color-ink: #09090b;        /* zinc-950 */
+  --color-muted: #71717a;
+  --color-line: #e4e4e7;
+  --color-chip: #f4f4f5;
+  --color-accent: #2563eb;     /* blue-600, as in the owner's repo */
+  --color-accent-dark: #1d4ed8;
+  --color-accent-soft: #eff6ff;
+  --color-sun: #d97706;        /* golden-eagle feather, used sparingly */
+  --color-night: #09090b;
+  --color-ph-bg: #fff4de;      /* «… оруулна» placeholders */
+  --color-ph-line: #dfa94a;
+  --color-ph-ink: #7a4d0c;
+
+  --radius-card: 24px;
+  --shadow-card: 0 1px 2px rgb(19 32 43 / 0.05), 0 10px 30px -12px rgb(19 32 43 / 0.16);
+  --shadow-lift: 0 2px 4px rgb(19 32 43 / 0.06), 0 22px 48px -18px rgb(19 32 43 / 0.32);
 }
 
 @layer base {
-  body {
-    font-family: var(--font-sans);
-    background-color: #fafafa;
-    color: #09090b;
-    overflow-x: clip;
+  :root {
+    color-scheme: light;
   }
-
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 88px;
+  }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Paints the phone's status-bar strip above the sticky dark navbar. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 50;
+    background: var(--color-night);
+  }
   h1,
   h2,
-  .font-editorial {
-    font-family: var(--font-display);
+  h3 {
+    text-wrap: balance;
   }
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 10px;
+  }
+  ::selection {
+    background: var(--color-accent);
+    color: #fff;
+  }
+}
+
+.gutter {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (min-width: 768px) {
+  .gutter {
+    padding-left: max(28px, env(safe-area-inset-left, 0px));
+    padding-right: max(28px, env(safe-area-inset-right, 0px));
+  }
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-.text-balance {
-  text-wrap: balance;
+/* Hero: slow push-in on the still photo when the clip is not available. */
+@keyframes kenburns {
+  from { transform: scale(1.02) translate3d(0, 0, 0); }
+  to { transform: scale(1.12) translate3d(-1.5%, -1%, 0); }
+}
+.kenburns {
+  animation: kenburns 7s ease-out forwards;
+}
+
+@keyframes progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.progress-fill {
+  transform-origin: left center;
+  animation-name: progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.marquee {
+  animation: marquee 60s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
 }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-
 .no-scrollbar {
-  -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-.pb-safe {
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
+  .kenburns,
+  .marquee {
+    animation: none;
+  }
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

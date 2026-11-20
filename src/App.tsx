@@ -1,192 +1,141 @@
-import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, MotionConfig } from 'motion/react';
-import { BookingSection } from './components/BookingSection';
-import { ExpeditionModal } from './components/ExpeditionModal';
-import { ExpeditionsSection } from './components/ExpeditionsSection';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Booking } from './components/Booking';
+import { Faq } from './components/Faq';
+import { FestivalsSection } from './components/FestivalsSection';
 import { Footer } from './components/Footer';
-import { HeroSection } from './components/HeroSection';
-import { MethodologySection } from './components/MethodologySection';
+import { Hero } from './components/Hero';
 import { Navbar } from './components/Navbar';
-import { TripRecommenderAndProof } from './components/TripRecommenderAndProof';
-import { EXPEDITIONS } from './data/expeditions';
-import { UI_COPY } from './i18n/translations';
-import type {
-  Expedition,
-  ExpeditionCategory,
-  Language,
-  SortOption,
-  TravelTier,
-} from './types/travel';
-import { filterAndSortTrips } from './utils/travelLogic';
+import { Recommender } from './components/Recommender';
+import { Team } from './components/Team';
+import { Testimonials } from './components/Testimonials';
+import { TourModal } from './components/TourModal';
+import { ToursSection } from './components/ToursSection';
+import { WhySection } from './components/WhySection';
+import { tourById, toursIn } from './data/tours';
+import { LangProvider, useLang } from './i18n/lang';
+import type { CategoryFilter, SortOption } from './types/travel';
+import { filterAndSortTours } from './utils/travelLogic';
 
-const SAVED_STORAGE_KEY = 'explore_altai_saved_trips_v1';
-const LANG_STORAGE_KEY = 'explore_altai_lang_v1';
+const SAVED_KEY = 'explorealtai_saved_v1';
+
+function readSaved(): string[] {
+  try {
+    const raw = window.localStorage.getItem(SAVED_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+const hashTour = () => {
+  const id = window.location.hash.slice(1);
+  return tourById(id) ? id : null;
+};
 
 export default function App() {
-  const [lang, setLang] = useState<Language>(() => {
-    try {
-      const saved = window.localStorage.getItem(LANG_STORAGE_KEY);
-      if (saved === 'en' || saved === 'mn') {
-        return saved;
-      }
-    } catch {
-      // Ignore storage read failures
-    }
-    return 'mn';
-  });
+  return (
+    <LangProvider>
+      <Site />
+    </LangProvider>
+  );
+}
 
-  const [category, setCategory] = useState<ExpeditionCategory>('all');
+function Site() {
+  const { lang } = useLang();
+  const allTours = useMemo(() => toursIn(lang), [lang]);
+  const [category, setCategory] = useState<CategoryFilter>('all');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [savedOnly, setSavedOnly] = useState(false);
-  const [savedIds, setSavedIds] = useState<string[]>(() => {
-    try {
-      const raw = window.localStorage.getItem(SAVED_STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          return parsed.filter((id): id is string => typeof id === 'string');
-        }
-      }
-    } catch {
-      // Ignore storage read failures
-    }
-    return [];
-  });
-
-  const [activeTrip, setActiveTrip] = useState<Expedition | null>(null);
-  const [bookingPrefill, setBookingPrefill] = useState<{
-    expeditionId: string;
-    travelers: number;
-    tier: TravelTier;
-    notes: string;
-  } | null>(null);
+  const [savedIds, setSavedIds] = useState<string[]>(readSaved);
+  const [activeId, setActiveId] = useState<string | null>(hashTour);
+  const [prefill, setPrefill] = useState<{ tourId: string; travelers: number; n: number } | null>(null);
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(LANG_STORAGE_KEY, lang);
+      window.localStorage.setItem(SAVED_KEY, JSON.stringify(savedIds));
     } catch {
-      // Ignore storage write failures
-    }
-    document.documentElement.lang = lang;
-    document.title = UI_COPY[lang].metaTitle;
-  }, [lang]);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify(savedIds));
-    } catch {
-      // Ignore storage write failures
+      /* storage may be unavailable */
     }
   }, [savedIds]);
 
-  const filteredExpeditions = useMemo(
-    () =>
-      filterAndSortTrips(EXPEDITIONS, {
-        category,
-        query,
-        sortBy,
-        savedOnly,
-        savedIds,
-      }),
-    [category, query, sortBy, savedOnly, savedIds],
+  useEffect(() => {
+    const onHash = () => setActiveId(hashTour());
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  const tours = useMemo(
+    () => filterAndSortTours(allTours, { category, query, sortBy, savedOnly, savedIds }),
+    [allTours, category, query, sortBy, savedOnly, savedIds],
   );
 
-  const toggleSaveTrip = (id: string) => {
-    setSavedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
-    );
-  };
+  const openTour = useCallback((id: string) => {
+    setActiveId(id);
+    try {
+      window.history.replaceState(null, '', `#${id}`);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
-  const resetFilters = () => {
+  const closeTour = useCallback(() => {
+    setActiveId(null);
+    try {
+      window.history.replaceState(null, '', '#tours');
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const book = useCallback((tourId: string, travelers: number) => {
+    closeTour();
+    setPrefill({ tourId, travelers, n: Date.now() });
+    window.setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 80);
+  }, [closeTour]);
+
+  const toggleSave = (id: string) => setSavedIds((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  const reset = () => {
     setCategory('all');
     setQuery('');
     setSortBy('featured');
     setSavedOnly(false);
   };
-
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleProceedToBook = (payload: {
-    expeditionId: string;
-    travelers: number;
-    tier: TravelTier;
-    notes: string;
-  }) => {
-    setActiveTrip(null);
-    setBookingPrefill(payload);
-    setTimeout(() => {
-      scrollToSection('booking');
-    }, 60);
-  };
+  const active = activeId ? allTours.find((x) => x.id === activeId) : undefined;
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-950">
-        <Navbar
-          lang={lang}
-          onLanguageChange={setLang}
-          onBookClick={() => scrollToSection('booking')}
-        />
-
+      <div className="flex min-h-screen flex-col bg-paper text-ink">
+        <Navbar />
         <main className="flex-1">
-          <HeroSection
-            lang={lang}
-            onExploreClick={() => scrollToSection('expeditions')}
-            onPlanClick={() => scrollToSection('recommender')}
-          />
-
-          <ExpeditionsSection
-            lang={lang}
-            expeditions={filteredExpeditions}
-            totalCount={EXPEDITIONS.length}
+          <Hero onOpenTour={openTour} />
+          <ToursSection
+            tours={tours}
             category={category}
-            onCategoryChange={setCategory}
+            onCategory={setCategory}
             query={query}
-            onQueryChange={setQuery}
+            onQuery={setQuery}
             sortBy={sortBy}
-            onSortChange={setSortBy}
+            onSort={setSortBy}
             savedIds={savedIds}
             savedOnly={savedOnly}
-            onToggleSavedOnly={() => setSavedOnly((prev) => !prev)}
-            onToggleSaveTrip={toggleSaveTrip}
-            onSelectTrip={(trip) => setActiveTrip(trip)}
-            onResetFilters={resetFilters}
+            onToggleSavedOnly={() => setSavedOnly((v) => !v)}
+            onToggleSave={toggleSave}
+            onOpen={openTour}
+            onReset={reset}
           />
-
-          <MethodologySection lang={lang} />
-
-          <TripRecommenderAndProof
-            lang={lang}
-            expeditions={EXPEDITIONS}
-            onSelectTrip={(trip) => setActiveTrip(trip)}
-          />
-
-          <BookingSection
-            lang={lang}
-            expeditions={EXPEDITIONS}
-            prefill={bookingPrefill}
-          />
+          <FestivalsSection onOpenTour={openTour} />
+          <WhySection />
+          <Recommender tours={allTours} onOpenTour={openTour} />
+          <Testimonials />
+          <Team />
+          <Faq />
+          <Booking tours={allTours} prefill={prefill} />
         </main>
-
-        <Footer lang={lang} />
-
-        <AnimatePresence>
-          {activeTrip && (
-            <ExpeditionModal
-              key={activeTrip.id}
-              lang={lang}
-              expedition={activeTrip}
-              onClose={() => setActiveTrip(null)}
-              onProceedToBook={handleProceedToBook}
-            />
-          )}
-        </AnimatePresence>
+        <Footer />
+        <AnimatePresence>{active && <TourModal key={active.id} tour={active} onClose={closeTour} onBook={book} />}</AnimatePresence>
       </div>
     </MotionConfig>
   );

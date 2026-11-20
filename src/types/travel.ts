@@ -1,117 +1,126 @@
-export type Language = 'mn' | 'en';
+export type Lang = 'mn' | 'en';
+/** Text written in both languages. */
+export type L<T = string> = { mn: T; en: T };
 
-export interface LocalizedText {
-  mn: string;
-  en: string;
-}
-
-export interface LocalizedList {
-  mn: string[];
-  en: string[];
-}
-
-export type ExpeditionCategory =
-  | 'all'
-  | 'trekking'
-  | 'eagle'
-  | 'river'
-  | 'horse'
-  | 'culture'
-  | 'discovery'
-  | 'wildlife';
-
+export type TourCategory = 'trek' | 'eagle' | 'horse' | 'river' | 'discovery' | 'culture' | 'wildlife';
+export type CategoryFilter = TourCategory | 'all';
 export type SortOption = 'featured' | 'duration-asc' | 'duration-desc' | 'price-asc';
 
-export type TravelTier = 'standard' | 'vip';
-
-export type AddonId = 'horse-guide' | 'photo-gear' | 'drone-film';
-
-export interface AddonOption {
-  id: AddonId;
-  label: LocalizedText;
-  description: LocalizedText;
-  pricePerPersonUsd: number;
-}
-
 export interface ItineraryDay {
-  dayLabel: LocalizedText;
-  title: LocalizedText;
-  description: LocalizedText;
-  meta?: LocalizedText;
+  /** "1", "3–7" гэх мэт өдрийн дугаар */
+  day: string;
+  title: string;
+  text: string;
 }
 
-export interface TourKeyFacts {
-  days: number | null;
-  durationLabel: LocalizedText;
-  priceUsd: number | null;
-  priceLabel: LocalizedText;
-  season: LocalizedText;
-  departures2027: LocalizedText;
-  groupSize: LocalizedText;
-  grade: LocalizedText;
-}
-
-export interface Expedition {
-  number: number;
+/**
+ * Нэг аялал. `null` утга нь «мэдээлэл хараахан ирээгүй» гэсэн үг:
+ * сайт дээр энэ талбарын оронд «… оруулна» гэсэн шар тэмдэглэгээ гарна.
+ */
+export interface Tour {
   id: string;
-  slug: string;
-  webPage: string;
-  oldPage?: string;
-  category: Exclude<ExpeditionCategory, 'all'>;
-  categoryLabel: LocalizedText;
-  title: LocalizedText;
-  subtitle: LocalizedText;
-  region: LocalizedText;
-  keyFacts: TourKeyFacts;
-  pace: 'relaxed' | 'balanced' | 'active';
-  elevationM?: number;
-  coordinates?: string;
-  imageUrl: string;
-  imageAlt: LocalizedText;
+  title: string;
+  titleEn: string;
+  category: TourCategory;
+  region: string;
+  days: number | null;
+  /** Өдрийн тоо тодорхойгүй үед харуулах тайлбар (жишээ нь «Голоор 3 өдөр») */
+  daysNote?: string;
+  priceUsd: number | null;
+  /** Ахын хэлсэн улирал. null бол «Улирал оруулна» */
+  season: string | null;
+  /** Аялал явдаг сарууд (1–12) — сонгогч, шүүлтүүрт ашиглана */
+  months: number[] | null;
+  group: string | null;
+  difficulty: string | null;
+  /** null бол «Эхлэх, дуусах цэг оруулна» */
+  startEnd: string | null;
+  /** 2027 оны гарах огноонууд. Байхгүй бол шар тэмдэглэгээ гарна */
+  departures?: string | null;
   featured?: boolean;
-  summary: LocalizedText;
-  overview: LocalizedList;
-  highlights: LocalizedList;
-  itineraryNote?: LocalizedText;
-  itinerary: ItineraryDay[];
-  included: LocalizedList;
-  notIncluded: LocalizedList;
+  summary: string;
+  highlights: string[];
+  itinerary: ItineraryDay[] | null;
+  included: string[] | null;
+  excluded: string[] | null;
+  /** public/img доторх зургийн нэрс (өргөтгөлгүй). Эхнийх нь нүүр зураг */
+  images: string[];
+  /** Аяллын онцгой тэмдэглэл */
+  note?: string;
+  /** Энэ аялалд тусгайлан нэмэх ёстой мэдээлэл */
+  todo?: string[];
+}
+
+/** The English version of a tour's text; numbers stay in tours.ts. */
+export type TourText = Pick<Tour, 'title' | 'region' | 'summary' | 'highlights' | 'itinerary'> &
+  Partial<Pick<Tour, 'season' | 'group' | 'difficulty' | 'startEnd' | 'daysNote' | 'included' | 'excluded' | 'note' | 'todo' | 'departures'>>;
+
+export interface HeroSlide {
+  id: string;
+  tourId: string;
+  label: L;
+  title: L;
+  meta: L;
+  poster: string;
+  video: string;
+}
+
+export interface Festival {
+  id: string;
+  name: string;
+  nameEn: string;
+  when: L;
+  month: 9 | 10;
+  place: L;
+  tourId?: string;
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  from: L;
+  quote: L;
+}
+
+export interface TeamMember {
+  id: string;
+  name: L;
+  fullName: L;
+  role: L;
+  bio: L;
+  /** public/img доторх зураг */
+  photo?: string;
+}
+
+export interface FaqItem {
+  id: string;
+  q: L;
+  a: L | null;
+  /** Хариулт бүрэн биш үед харуулах тэмдэглэгээ */
+  todo?: L;
 }
 
 export interface FilterState {
-  category: ExpeditionCategory;
+  category: CategoryFilter;
   query: string;
   sortBy: SortOption;
   savedOnly: boolean;
   savedIds: string[];
 }
 
-export interface PriceEstimate {
-  isPriceOnRequest: boolean;
-  basePriceUsd: number;
-  baseSubtotalUsd: number;
-  tierMultiplier: number;
-  addonsTotalUsd: number;
-  discountRate: number;
-  discountAmountUsd: number;
-  totalUsd: number;
-  perPersonUsd: number;
-}
-
 export interface RecommenderCriteria {
-  interest: Exclude<ExpeditionCategory, 'all'> | 'any';
-  durationBucket: 'short' | 'medium' | 'long';
-  pace: 'relaxed' | 'balanced' | 'active';
+  interest: TourCategory | 'any';
+  length: 'short' | 'medium' | 'long';
+  season: 'summer' | 'autumn' | 'winter' | 'any';
 }
 
 export interface BookingFormValues {
   fullName: string;
   email: string;
   phone: string;
-  expeditionId: string;
+  tourId: string;
   travelers: number;
-  departureDate: string;
-  tier: TravelTier;
+  month: string;
   notes: string;
 }
 
@@ -119,16 +128,14 @@ export interface BookingValidationErrors {
   fullName?: string;
   email?: string;
   phone?: string;
-  expeditionId?: string;
+  tourId?: string;
   travelers?: string;
-  departureDate?: string;
+  month?: string;
 }
 
-export interface Testimonial {
-  id: string;
-  name: LocalizedText;
-  role: LocalizedText;
-  expeditionTitle: LocalizedText;
-  quote: LocalizedText;
-  outcome: LocalizedText;
+export interface PriceEstimate {
+  /** null бол аяллын үнэ хараахан ороогүй */
+  totalUsd: number | null;
+  depositUsd: number;
+  balanceUsd: number | null;
 }

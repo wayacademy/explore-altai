@@ -1,60 +1,56 @@
-import { UI_COPY } from '../i18n/translations';
-import type { Language } from '../types/travel';
+import { COMPANY } from '../data/site';
+import { useLang } from '../i18n/lang';
+import { Logo } from './Navbar';
+import { Ph } from './Placeholder';
 
-interface FooterProps {
-  lang: Language;
-}
-
-export function Footer({ lang }: FooterProps) {
-  const copy = UI_COPY[lang];
-
+export function Footer() {
+  const { t, pick } = useLang();
+  const f = t.footer;
   return (
-    <footer className="bg-zinc-950 text-zinc-300 border-t border-zinc-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8 pb-8 border-b border-zinc-800">
-          <div>
-            <span className="font-editorial text-xl font-extrabold text-white tracking-tight">
-              {copy.brand}
-            </span>
-            <p className="text-sm text-zinc-400 mt-2 max-w-md leading-relaxed">
-              {copy.footer.tagline}
-            </p>
+    <footer className="gutter pb-8 pt-6">
+      <div className="mx-auto max-w-[1240px] rounded-[var(--radius-card)] bg-ink px-6 py-8 text-white md:px-10">
+        <div className="flex flex-col gap-8 md:flex-row md:justify-between">
+          <div className="max-w-sm">
+            <Logo light />
+            <p className="mt-4 text-sm leading-relaxed text-white/65">{f.about(COMPANY.legalName)}</p>
+            <ul className="mt-4 space-y-1 text-sm text-white/80">
+              {COMPANY.awards.map((a) => <li key={a.en}>★ {pick(a)}</li>)}
+            </ul>
           </div>
-
-          <nav
-            aria-label={copy.footer.navLabel}
-            className="flex flex-wrap gap-x-6 gap-y-2 text-sm"
-          >
-            <a
-              href="#expeditions"
-              className="hover:text-white transition-colors py-1"
-            >
-              {copy.nav.tours}
-            </a>
-            <a
-              href="#methodology"
-              className="hover:text-white transition-colors py-1"
-            >
-              {copy.nav.howItWorks}
-            </a>
-            <a
-              href="#recommender"
-              className="hover:text-white transition-colors py-1"
-            >
-              {copy.nav.finder}
-            </a>
-            <a
-              href="#booking"
-              className="hover:text-white transition-colors py-1"
-            >
-              {copy.nav.contact}
-            </a>
-          </nav>
+          <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
+            <div>
+              <p className="font-bold">{f.tours}</p>
+              <ul className="mt-3 space-y-2 text-white/70">
+                <li><a href="#tours" className="hover:text-white">{f.allTours}</a></li>
+                <li><a href="#festivals" className="hover:text-white">{f.festivals}</a></li>
+                <li><a href="#finder" className="hover:text-white">{f.finder}</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-bold">{f.company}</p>
+              <ul className="mt-3 space-y-2 text-white/70">
+                <li><a href="#why" className="hover:text-white">{f.about2}</a></li>
+                <li><a href="#team" className="hover:text-white">{f.team}</a></li>
+                <li><a href="#reviews" className="hover:text-white">{f.reviews}</a></li>
+                <li><a href="#faq" className="hover:text-white">{f.faq}</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-bold">{f.contact}</p>
+              <ul className="mt-3 space-y-2 text-white/70">
+                {COMPANY.phones.map((p) => <li key={p} className="select-all">{p}</li>)}
+                <li className="select-all break-all">{COMPANY.email}</li>
+                <li className="select-all break-all">{COMPANY.companyEmail}</li>
+                <li className="select-all break-all">{COMPANY.facebook}</li>
+              </ul>
+            </div>
+          </div>
         </div>
-
-        <div className="pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-zinc-400">
-          <p>{copy.footer.copyright}</p>
-          <p>{copy.footer.locationLine}</p>
+        <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {COMPANY.founded}–{new Date().getFullYear()} Explore the Great Altai Tours and Expeditions</p>
+          <div className="flex flex-wrap gap-2">
+            <Ph>{f.socialTodo}</Ph>
+          </div>
         </div>
       </div>
     </footer>
