@@ -5,6 +5,7 @@ import type {
   BookingValidationErrors,
   Expedition,
   FilterState,
+  Language,
   PriceEstimate,
   RecommenderCriteria,
   TravelTier,
@@ -13,27 +14,45 @@ import type {
 export const ADDON_OPTIONS: AddonOption[] = [
   {
     id: 'horse-guide',
-    label: 'Морин аяллын тусгай хөтөч',
-    description: 'Нэмэлт морь ба орон нутгийн уяач хөтөч',
-    pricePerPersonMnt: 240000,
+    label: {
+      mn: 'Нэмэлт морин хөтөч ба ачааны мал',
+      en: 'Dedicated Horse Guide & Extra Pack Animal',
+    },
+    description: {
+      mn: 'Хөтөч, эмээл тоноглол болон ачаа зөөх нэмэлт морь/тэмээ',
+      en: 'Additional wrangler support & luggage horse/camel allocation',
+    },
+    pricePerPersonUsd: 160,
   },
   {
     id: 'photo-gear',
-    label: 'Гэрэл зургийн зөвлөх',
-    description: 'Нар мандах, жаргах цагийн зураг авалтын төлөвлөлт',
-    pricePerPersonMnt: 320000,
+    label: {
+      mn: 'Гэрэл зургийн хөтөч ба цагийн төлөвлөлт',
+      en: 'Wildlife & Eagle Photography Field Guide',
+    },
+    description: {
+      mn: 'Нар мандах/жаргах цаг болон ан амьтны ажиглалтын цэгүүд',
+      en: 'Golden-hour positioning for landscapes, eagles & wildlife',
+    },
+    pricePerPersonUsd: 210,
   },
   {
     id: 'drone-film',
-    label: 'Аяллын богино баримтат кино',
-    description: '4K дрон болон газрын дүрс эвлүүлэг',
-    pricePerPersonMnt: 450000,
+    label: {
+      mn: 'Аяллын 4K баримтат бичлэг ба зураг',
+      en: 'Expedition 4K Drone & Documentary Edit',
+    },
+    description: {
+      mn: 'Багийн аяллын дурсамжийн эвлүүлсэн богино кино',
+      en: 'Edited aerial and ground highlight film of your expedition',
+    },
+    pricePerPersonUsd: 290,
   },
 ];
 
-export function formatMnt(amount: number): string {
+export function formatUsd(amount: number): string {
   const rounded = Math.round(amount);
-  return `₮${rounded.toLocaleString('en-US')}`;
+  return `$${rounded.toLocaleString('en-US')}`;
 }
 
 export function filterAndSortTrips(
@@ -51,12 +70,21 @@ export function filterAndSortTrips(
     }
     if (normalizedQuery.length > 0) {
       const searchable = [
-        trip.title,
-        trip.subtitle,
-        trip.region,
-        trip.categoryLabel,
-        trip.summary,
-        ...trip.highlights,
+        String(trip.number),
+        trip.title.mn,
+        trip.title.en,
+        trip.subtitle.mn,
+        trip.subtitle.en,
+        trip.region.mn,
+        trip.region.en,
+        trip.categoryLabel.mn,
+        trip.categoryLabel.en,
+        trip.summary.mn,
+        trip.summary.en,
+        ...trip.highlights.mn,
+        ...trip.highlights.en,
+        ...trip.overview.mn,
+        ...trip.overview.en,
       ]
         .join(' ')
         .toLowerCase();
@@ -69,36 +97,55 @@ export function filterAndSortTrips(
 
   const sorted = [...filtered].sort((a, b) => {
     if (state.sortBy === 'price-asc') {
-      return a.basePriceMnt - b.basePriceMnt;
+      const aPrice = a.keyFacts.priceUsd ?? Number.MAX_SAFE_INTEGER;
+      const bPrice = b.keyFacts.priceUsd ?? Number.MAX_SAFE_INTEGER;
+      if (aPrice !== bPrice) {
+        return aPrice - bPrice;
+      }
+      return a.number - b.number;
     }
     if (state.sortBy === 'duration-asc') {
-      return a.days - b.days;
+      const aDays = a.keyFacts.days ?? Number.MAX_SAFE_INTEGER;
+      const bDays = b.keyFacts.days ?? Number.MAX_SAFE_INTEGER;
+      if (aDays !== bDays) {
+        return aDays - bDays;
+      }
+      return a.number - b.number;
     }
-    const featDiff = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
-    if (featDiff !== 0) {
-      return featDiff;
+    if (state.sortBy === 'duration-desc') {
+      const aDays = a.keyFacts.days ?? -1;
+      const bDays = b.keyFacts.days ?? -1;
+      if (aDays !== bDays) {
+        return bDays - aDays;
+      }
+      return a.number - b.number;
     }
-    return b.days - a.days;
+    // Featured / default catalog order 1..20
+    return a.number - b.number;
   });
 
   return sorted;
 }
 
 export function calculateTripEstimate(
-  basePriceMnt: number,
+  basePriceUsd: number | null,
   travelers: number,
   tier: TravelTier,
   selectedAddons: AddonId[],
 ): PriceEstimate {
   const safeTravelers = Math.max(1, Math.min(20, Math.floor(travelers)));
+  const isPriceOnRequest = basePriceUsd === null;
+  const effectiveBase = basePriceUsd ?? 0;
   const tierMultiplier = tier === 'vip' ? 1.35 : 1;
-  const baseSubtotal = Math.round(basePriceMnt * safeTravelers * tierMultiplier);
+  const baseSubtotalUsd = Math.round(
+    effectiveBase * safeTravelers * tierMultiplier,
+  );
 
   const addonsPerPerson = selectedAddons.reduce((sum, id) => {
     const found = ADDON_OPTIONS.find((item) => item.id === id);
-    return sum + (found ? found.pricePerPersonMnt : 0);
+    return sum + (found ? found.pricePerPersonUsd : 0);
   }, 0);
-  const addonsTotal = addonsPerPerson * safeTravelers;
+  const addonsTotalUsd = addonsPerPerson * safeTravelers;
 
   let discountRate = 0;
   if (safeTravelers >= 8) {
@@ -107,19 +154,21 @@ export function calculateTripEstimate(
     discountRate = 0.05;
   }
 
-  const gross = baseSubtotal + addonsTotal;
-  const discountAmount = Math.round(gross * discountRate);
-  const totalMnt = gross - discountAmount;
-  const perPersonMnt = Math.round(totalMnt / safeTravelers);
+  const gross = baseSubtotalUsd + addonsTotalUsd;
+  const discountAmountUsd = Math.round(gross * discountRate);
+  const totalUsd = gross - discountAmountUsd;
+  const perPersonUsd = Math.round(totalUsd / safeTravelers);
 
   return {
-    baseSubtotal,
+    isPriceOnRequest,
+    basePriceUsd: effectiveBase,
+    baseSubtotalUsd,
     tierMultiplier,
-    addonsTotal,
+    addonsTotalUsd,
     discountRate,
-    discountAmount,
-    totalMnt,
-    perPersonMnt,
+    discountAmountUsd,
+    totalUsd,
+    perPersonUsd,
   };
 }
 
@@ -131,19 +180,22 @@ export function recommendTrips(
     let score = 0;
 
     if (criteria.interest === 'any' || trip.category === criteria.interest) {
-      score += 4;
+      score += 5;
     }
 
-    if (criteria.durationBucket === 'short' && trip.days <= 5) {
-      score += 3;
-    } else if (
-      criteria.durationBucket === 'medium' &&
-      trip.days >= 6 &&
-      trip.days <= 8
-    ) {
-      score += 3;
-    } else if (criteria.durationBucket === 'long' && trip.days >= 9) {
-      score += 3;
+    const days = trip.keyFacts.days;
+    if (criteria.durationBucket === 'short') {
+      if ((days !== null && days <= 10) || days === null) {
+        score += days !== null ? 3 : 2;
+      }
+    } else if (criteria.durationBucket === 'medium') {
+      if (days !== null && days >= 11 && days <= 14) {
+        score += 3;
+      }
+    } else if (criteria.durationBucket === 'long') {
+      if (days !== null && days >= 15) {
+        score += 3;
+      }
     }
 
     if (trip.pace === criteria.pace) {
@@ -157,39 +209,62 @@ export function recommendTrips(
     return { trip, score };
   });
 
-  scored.sort((a, b) => b.score - a.score || a.trip.days - b.trip.days);
+  scored.sort((a, b) => b.score - a.score || a.trip.number - b.trip.number);
   return scored.slice(0, 2).map((entry) => entry.trip);
 }
 
 export function validateBookingForm(
   values: BookingFormValues,
+  lang: Language = 'mn',
 ): BookingValidationErrors {
   const errors: BookingValidationErrors = {};
 
   if (!values.fullName || values.fullName.trim().length < 2) {
-    errors.fullName = 'Овог нэрээ бүтнээр оруулна уу (хамгийн багадаа 2 тэмдэгт).';
+    errors.fullName =
+      lang === 'en'
+        ? 'Please enter your full name (at least 2 characters).'
+        : 'Овог нэрээ бүтнээр оруулна уу (хамгийн багадаа 2 тэмдэгт).';
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   if (!values.email || !emailPattern.test(values.email.trim())) {
-    errors.email = 'Зөв имэйл хаяг оруулна уу (жишээ: bat@domain.mn).';
+    errors.email =
+      lang === 'en'
+        ? 'Please enter a valid email address (e.g., name@domain.com).'
+        : 'Зөв имэйл хаяг оруулна уу (жишээ: bat@domain.mn).';
   }
 
   const digitsOnly = (values.phone || '').replace(/\D/g, '');
   if (digitsOnly.length < 8 || digitsOnly.length > 15) {
-    errors.phone = 'Холбогдох утасны дугаараа зөв оруулна уу (8–15 орон).';
+    errors.phone =
+      lang === 'en'
+        ? 'Please enter a valid phone number (8–15 digits).'
+        : 'Холбогдох утасны дугаараа зөв оруулна уу (8–15 орон).';
   }
 
   if (!values.expeditionId) {
-    errors.expeditionId = 'Аяллын чиглэлээ сонгоно уу.';
+    errors.expeditionId =
+      lang === 'en'
+        ? 'Please choose a tour route.'
+        : 'Аяллын чиглэлээ сонгоно уу.';
   }
 
-  if (!Number.isFinite(values.travelers) || values.travelers < 1 || values.travelers > 20) {
-    errors.travelers = 'Аялагчдын тоо 1-ээс 20 хооронд байх ёстой.';
+  if (
+    !Number.isFinite(values.travelers) ||
+    values.travelers < 1 ||
+    values.travelers > 20
+  ) {
+    errors.travelers =
+      lang === 'en'
+        ? 'Travelers must be between 1 and 20.'
+        : 'Аялагчдын тоо 1-ээс 20 хооронд байх ёстой.';
   }
 
   if (!values.departureDate) {
-    errors.departureDate = 'Гарах боломжит огноогоо сонгоно уу.';
+    errors.departureDate =
+      lang === 'en'
+        ? 'Please choose a preferred departure date.'
+        : 'Гарах боломжит огноогоо сонгоно уу.';
   }
 
   return errors;
@@ -198,5 +273,5 @@ export function validateBookingForm(
 export function generateBookingReference(expeditionSlug: string): string {
   const code = expeditionSlug.slice(0, 3).toUpperCase();
   const suffix = Math.floor(1000 + Math.random() * 9000);
-  return `KT-2026-${code}-${suffix}`;
+  return `EA-2026-${code}-${suffix}`;
 }

@@ -1,11 +1,26 @@
+export type Language = 'mn' | 'en';
+
+export interface LocalizedText {
+  mn: string;
+  en: string;
+}
+
+export interface LocalizedList {
+  mn: string[];
+  en: string[];
+}
+
 export type ExpeditionCategory =
   | 'all'
-  | 'mountain'
-  | 'desert'
-  | 'lake'
-  | 'culture';
+  | 'trekking'
+  | 'eagle'
+  | 'river'
+  | 'horse'
+  | 'culture'
+  | 'discovery'
+  | 'wildlife';
 
-export type SortOption = 'featured' | 'price-asc' | 'duration-asc';
+export type SortOption = 'featured' | 'duration-asc' | 'duration-desc' | 'price-asc';
 
 export type TravelTier = 'standard' | 'vip';
 
@@ -13,44 +28,54 @@ export type AddonId = 'horse-guide' | 'photo-gear' | 'drone-film';
 
 export interface AddonOption {
   id: AddonId;
-  label: string;
-  description: string;
-  pricePerPersonMnt: number;
+  label: LocalizedText;
+  description: LocalizedText;
+  pricePerPersonUsd: number;
 }
 
 export interface ItineraryDay {
-  day: number;
-  title: string;
-  route: string;
-  description: string;
-  accommodation: string;
+  dayLabel: LocalizedText;
+  title: LocalizedText;
+  description: LocalizedText;
+  meta?: LocalizedText;
+}
+
+export interface TourKeyFacts {
+  days: number | null;
+  durationLabel: LocalizedText;
+  priceUsd: number | null;
+  priceLabel: LocalizedText;
+  season: LocalizedText;
+  departures2027: LocalizedText;
+  groupSize: LocalizedText;
+  grade: LocalizedText;
 }
 
 export interface Expedition {
+  number: number;
   id: string;
   slug: string;
-  title: string;
-  subtitle: string;
-  region: string;
+  webPage: string;
+  oldPage?: string;
   category: Exclude<ExpeditionCategory, 'all'>;
-  categoryLabel: string;
-  days: number;
-  nights: number;
-  basePriceMnt: number;
-  difficulty: 'Хөнгөн' | 'Дунд' | 'Ахисан';
+  categoryLabel: LocalizedText;
+  title: LocalizedText;
+  subtitle: LocalizedText;
+  region: LocalizedText;
+  keyFacts: TourKeyFacts;
   pace: 'relaxed' | 'balanced' | 'active';
-  maxGroupSize: number;
-  bestSeason: string;
-  elevationM: number;
-  distanceKm: number;
-  coordinates: string;
+  elevationM?: number;
+  coordinates?: string;
   imageUrl: string;
-  imageAlt: string;
+  imageAlt: LocalizedText;
   featured?: boolean;
-  summary: string;
-  highlights: string[];
-  included: string[];
+  summary: LocalizedText;
+  overview: LocalizedList;
+  highlights: LocalizedList;
+  itineraryNote?: LocalizedText;
   itinerary: ItineraryDay[];
+  included: LocalizedList;
+  notIncluded: LocalizedList;
 }
 
 export interface FilterState {
@@ -62,13 +87,15 @@ export interface FilterState {
 }
 
 export interface PriceEstimate {
-  baseSubtotal: number;
+  isPriceOnRequest: boolean;
+  basePriceUsd: number;
+  baseSubtotalUsd: number;
   tierMultiplier: number;
-  addonsTotal: number;
+  addonsTotalUsd: number;
   discountRate: number;
-  discountAmount: number;
-  totalMnt: number;
-  perPersonMnt: number;
+  discountAmountUsd: number;
+  totalUsd: number;
+  perPersonUsd: number;
 }
 
 export interface RecommenderCriteria {
@@ -99,9 +126,9 @@ export interface BookingValidationErrors {
 
 export interface Testimonial {
   id: string;
-  name: string;
-  role: string;
-  expeditionTitle: string;
-  quote: string;
-  outcome: string;
+  name: LocalizedText;
+  role: LocalizedText;
+  expeditionTitle: LocalizedText;
+  quote: LocalizedText;
+  outcome: LocalizedText;
 }

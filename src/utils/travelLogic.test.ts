@@ -4,103 +4,154 @@ import { EXPEDITIONS } from '../data/expeditions';
 import {
   calculateTripEstimate,
   filterAndSortTrips,
-  formatMnt,
+  formatUsd,
   recommendTrips,
   validateBookingForm,
 } from './travelLogic';
 
-test('formatMnt formats Mongolian Tugrik cleanly without decimals', () => {
-  assert.equal(formatMnt(3850000), '₮3,850,000');
-  assert.equal(formatMnt(1250000.4), '₮1,250,000');
+test('all 20 Explore Altai tours and all 7 categories are present without loss', () => {
+  assert.equal(EXPEDITIONS.length, 20);
+  const categories = new Set(EXPEDITIONS.map((t) => t.category));
+  assert.deepEqual(
+    [...categories].sort(),
+    ['culture', 'discovery', 'eagle', 'horse', 'river', 'trekking', 'wildlife'],
+  );
+  assert.equal(EXPEDITIONS[0].title.en, 'Classic Altai Trekking');
+  assert.equal(EXPEDITIONS[0].keyFacts.priceUsd, 2350);
+  assert.equal(EXPEDITIONS[19].title.en, 'Discover the Wild Altai: Wildlife Safari');
 });
 
-test('filterAndSortTrips filters by category, search query, and saved list', () => {
-  const desertOnly = filterAndSortTrips(EXPEDITIONS, {
-    category: 'desert',
+test('formatUsd formats USD cleanly without decimals', () => {
+  assert.equal(formatUsd(2350), '$2,350');
+  assert.equal(formatUsd(1250.4), '$1,250');
+});
+
+test('filterAndSortTrips filters by category, bilingual search query, and saved list', () => {
+  const eagleOnly = filterAndSortTrips(EXPEDITIONS, {
+    category: 'eagle',
     query: '',
     sortBy: 'featured',
     savedOnly: false,
     savedIds: [],
   });
-  assert.equal(desertOnly.length, 1);
-  assert.equal(desertOnly[0].id, 'gobi-khongor');
+  assert.equal(eagleOnly.length, 3);
 
-  const queryMatch = filterAndSortTrips(EXPEDITIONS, {
-    category: 'all',
-    query: 'Хөвсгөл',
+  const riverOnly = filterAndSortTrips(EXPEDITIONS, {
+    category: 'river',
+    query: '',
     sortBy: 'featured',
     savedOnly: false,
     savedIds: [],
   });
-  assert.equal(queryMatch.length, 1);
-  assert.equal(queryMatch[0].id, 'khuvsgul-taiga');
+  assert.equal(riverOnly.length, 5);
+
+  const mnQueryMatch = filterAndSortTrips(EXPEDITIONS, {
+    category: 'all',
+    query: 'Цамбагарав',
+    sortBy: 'featured',
+    savedOnly: false,
+    savedIds: [],
+  });
+  assert.ok(mnQueryMatch.some((t) => t.id === 'tsambagarav-trekking'));
+
+  const enQueryMatch = filterAndSortTrips(EXPEDITIONS, {
+    category: 'all',
+    query: 'Chuluut Gol',
+    sortBy: 'featured',
+    savedOnly: false,
+    savedIds: [],
+  });
+  assert.equal(enQueryMatch.length, 1);
+  assert.equal(enQueryMatch[0].id, 'khangai-nuruu-heart-of-mongolia');
 
   const savedOnly = filterAndSortTrips(EXPEDITIONS, {
     category: 'all',
     query: '',
-    sortBy: 'price-asc',
+    sortBy: 'duration-asc',
     savedOnly: true,
-    savedIds: ['terelj-khentii', 'altai-tavan-bogd'],
+    savedIds: ['munkhhairkhan-trekking', 'golden-eagle-festival-horseback'],
   });
   assert.equal(savedOnly.length, 2);
-  assert.ok(savedOnly[0].basePriceMnt <= savedOnly[1].basePriceMnt);
+  assert.equal(savedOnly[0].id, 'golden-eagle-festival-horseback');
 });
 
-test('calculateTripEstimate applies VIP multiplier, add-ons, and group discounts', () => {
-  const soloStandard = calculateTripEstimate(2000000, 2, 'standard', []);
-  assert.equal(soloStandard.discountRate, 0);
-  assert.equal(soloStandard.totalMnt, 4000000);
-  assert.equal(soloStandard.perPersonMnt, 2000000);
+test('calculateTripEstimate applies USD pricing, VIP multiplier, add-ons, group discounts, and On Request mode', () => {
+  const classicTwo = calculateTripEstimate(2350, 2, 'standard', []);
+  assert.equal(classicTwo.isPriceOnRequest, false);
+  assert.equal(classicTwo.totalUsd, 4700);
+  assert.equal(classicTwo.discountRate, 0);
 
-  const groupFourWithAddon = calculateTripEstimate(2000000, 4, 'standard', ['horse-guide']);
-  // Base = 8,000,000 + Addon (240,000 * 4 = 960,000) = 8,960,000; 5% discount = 448,000 => 8,512,000
+  const groupFourWithAddon = calculateTripEstimate(2350, 4, 'standard', ['horse-guide']);
+  // Base = 9,400 + Addon (160 * 4 = 640) = 10,040; 5% discount = 502 => 9,538
   assert.equal(groupFourWithAddon.discountRate, 0.05);
-  assert.equal(groupFourWithAddon.discountAmount, 448000);
-  assert.equal(groupFourWithAddon.totalMnt, 8512000);
+  assert.equal(groupFourWithAddon.discountAmountUsd, 502);
+  assert.equal(groupFourWithAddon.totalUsd, 9538);
 
-  const vipEight = calculateTripEstimate(1000000, 8, 'vip', []);
-  // Base = 1,000,000 * 8 * 1.35 = 10,800,000; 10% discount = 1,080,000 => 9,720,000
+  const vipEight = calculateTripEstimate(1000, 8, 'vip', []);
+  // Base = 1,000 * 8 * 1.35 = 10,800; 10% discount = 1,080 => 9,720
   assert.equal(vipEight.discountRate, 0.1);
-  assert.equal(vipEight.totalMnt, 9720000);
+  assert.equal(vipEight.totalUsd, 9720);
+
+  const onRequestTour = calculateTripEstimate(null, 4, 'standard', ['photo-gear']);
+  assert.equal(onRequestTour.isPriceOnRequest, true);
+  assert.equal(onRequestTour.addonsTotalUsd, 840);
 });
 
-test('recommendTrips returns top 2 expeditions matching duration and interest', () => {
+test('recommendTrips returns top 2 tours matching category, duration and pace', () => {
   const results = recommendTrips(EXPEDITIONS, {
-    interest: 'mountain',
-    durationBucket: 'long',
-    pace: 'active',
+    interest: 'eagle',
+    durationBucket: 'short',
+    pace: 'balanced',
   });
   assert.equal(results.length, 2);
-  assert.equal(results[0].id, 'altai-tavan-bogd');
+  assert.equal(results[0].category, 'eagle');
 });
 
-test('validateBookingForm catches invalid inputs and passes valid submission', () => {
-  const invalid = validateBookingForm({
-    fullName: '',
-    email: 'not-an-email',
-    phone: '123',
-    expeditionId: '',
-    travelers: 0,
-    departureDate: '',
-    tier: 'standard',
-    notes: '',
-  });
-  assert.ok(invalid.fullName);
-  assert.ok(invalid.email);
-  assert.ok(invalid.phone);
-  assert.ok(invalid.expeditionId);
-  assert.ok(invalid.travelers);
-  assert.ok(invalid.departureDate);
+test('validateBookingForm catches invalid inputs and produces localized MN/EN errors', () => {
+  const invalidMn = validateBookingForm(
+    {
+      fullName: '',
+      email: 'bad',
+      phone: '123',
+      expeditionId: '',
+      travelers: 0,
+      departureDate: '',
+      tier: 'standard',
+      notes: '',
+    },
+    'mn',
+  );
+  assert.ok(invalidMn.fullName?.includes('Овог нэр'));
+  assert.ok(invalidMn.email);
+  assert.ok(invalidMn.phone);
 
-  const valid = validateBookingForm({
-    fullName: 'Бат-Эрдэнэ Дорж',
-    email: 'baterdene@mongoltravel.mn',
-    phone: '99112233',
-    expeditionId: 'altai-tavan-bogd',
-    travelers: 4,
-    departureDate: '2026-07-15',
-    tier: 'vip',
-    notes: 'Гэрэл зургийн хөтөч хүсэж байна',
-  });
+  const invalidEn = validateBookingForm(
+    {
+      fullName: '',
+      email: 'bad',
+      phone: '123',
+      expeditionId: '',
+      travelers: 0,
+      departureDate: '',
+      tier: 'standard',
+      notes: '',
+    },
+    'en',
+  );
+  assert.ok(invalidEn.fullName?.includes('full name'));
+
+  const valid = validateBookingForm(
+    {
+      fullName: 'Elena Becker',
+      email: 'elena@example.com',
+      phone: '+97699063539',
+      expeditionId: 'classic-altai-trekking',
+      travelers: 4,
+      departureDate: '2026-08-10',
+      tier: 'vip',
+      notes: 'Custom pace',
+    },
+    'en',
+  );
   assert.deepEqual(valid, {});
 });

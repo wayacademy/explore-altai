@@ -11,6 +11,7 @@
     font-family: var(--font-sans);
     background-color: #fafafa;
     color: #09090b;
+    overflow-x: clip;
   }
 
   h1,
@@ -26,6 +27,19 @@
 
 .text-balance {
   text-wrap: balance;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 @media (prefers-reduced-motion: reduce) {

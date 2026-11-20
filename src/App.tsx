@@ -9,17 +9,32 @@ import { MethodologySection } from './components/MethodologySection';
 import { Navbar } from './components/Navbar';
 import { TripRecommenderAndProof } from './components/TripRecommenderAndProof';
 import { EXPEDITIONS } from './data/expeditions';
+import { UI_COPY } from './i18n/translations';
 import type {
   Expedition,
   ExpeditionCategory,
+  Language,
   SortOption,
   TravelTier,
 } from './types/travel';
 import { filterAndSortTrips } from './utils/travelLogic';
 
-const SAVED_STORAGE_KEY = 'khukh_tenger_saved_trips_v1';
+const SAVED_STORAGE_KEY = 'explore_altai_saved_trips_v1';
+const LANG_STORAGE_KEY = 'explore_altai_lang_v1';
 
 export default function App() {
+  const [lang, setLang] = useState<Language>(() => {
+    try {
+      const saved = window.localStorage.getItem(LANG_STORAGE_KEY);
+      if (saved === 'en' || saved === 'mn') {
+        return saved;
+      }
+    } catch {
+      // Ignore storage read failures
+    }
+    return 'mn';
+  });
+
   const [category, setCategory] = useState<ExpeditionCategory>('all');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
@@ -46,6 +61,16 @@ export default function App() {
     tier: TravelTier;
     notes: string;
   } | null>(null);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch {
+      // Ignore storage write failures
+    }
+    document.documentElement.lang = lang;
+    document.title = UI_COPY[lang].metaTitle;
+  }, [lang]);
 
   useEffect(() => {
     try {
@@ -102,16 +127,22 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
-        <Navbar onBookClick={() => scrollToSection('booking')} />
+      <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-950">
+        <Navbar
+          lang={lang}
+          onLanguageChange={setLang}
+          onBookClick={() => scrollToSection('booking')}
+        />
 
         <main className="flex-1">
           <HeroSection
+            lang={lang}
             onExploreClick={() => scrollToSection('expeditions')}
             onPlanClick={() => scrollToSection('recommender')}
           />
 
           <ExpeditionsSection
+            lang={lang}
             expeditions={filteredExpeditions}
             totalCount={EXPEDITIONS.length}
             category={category}
@@ -128,22 +159,28 @@ export default function App() {
             onResetFilters={resetFilters}
           />
 
-          <MethodologySection />
+          <MethodologySection lang={lang} />
 
           <TripRecommenderAndProof
+            lang={lang}
             expeditions={EXPEDITIONS}
             onSelectTrip={(trip) => setActiveTrip(trip)}
           />
 
-          <BookingSection expeditions={EXPEDITIONS} prefill={bookingPrefill} />
+          <BookingSection
+            lang={lang}
+            expeditions={EXPEDITIONS}
+            prefill={bookingPrefill}
+          />
         </main>
 
-        <Footer />
+        <Footer lang={lang} />
 
         <AnimatePresence>
           {activeTrip && (
             <ExpeditionModal
               key={activeTrip.id}
+              lang={lang}
               expedition={activeTrip}
               onClose={() => setActiveTrip(null)}
               onProceedToBook={handleProceedToBook}
